@@ -1,5 +1,5 @@
 #!/bin/sh
-APK_NAME="Phicomm-R1.apk"
+APK_NAME="Phicomm-R1e.apk"
 APK_PATH="$HOME/$APK_NAME"
 ADB_DEVICE_IP="192.168.43.1"
 ADB_DEVICE_PORT="5555"
