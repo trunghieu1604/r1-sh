@@ -121,14 +121,6 @@ step_uninstall_existing() {
     adb_exec shell /system/bin/pm uninstall "$package_name"
 }
 
-restore_packages() {
-    log_info "Khoi phuc cac ung dung mac dinh..."
-    local apps="airskill exceptionreporter otaservice systemtool productiontest bugreport"
-    for app in $apps; do
-        adb_exec shell /system/bin/pm unhide "com.phicomm.speaker.$app"
-    done
-}
-
 step_install_apk() {
     local name="$1"
     local path="$2"
