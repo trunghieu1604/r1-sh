@@ -4,7 +4,7 @@ rm -f $HOME/*.apk
 rm -f $HOME/*.sh
 echo "Clean up old files done."
 
-wget -O $HOME/tai-files.sh "$DOMAIN/$VERSION/download.sh"
+wget -O $HOME/download.sh "$DOMAIN/$VERSION/download.sh"
 chmod +x $HOME/download.sh
 chmod +x $HOME/voicebot.sh
 
