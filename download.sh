@@ -1,7 +1,7 @@
 #!/bin/sh
 
 APK_NAME="Phicomm-R1e.apk"
-APK_URL="https://github.com/trunghieu1604/r1-ai/releases/download/v1.0/$APK_NAME"
+APK_URL="https://github.com/trunghieu1604/r1-sh/releases/download/abc/$APK_NAME"
 APK_PATH="$HOME/$APK_NAME"
 
 prepare_apk() {
