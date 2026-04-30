@@ -5,7 +5,7 @@ rm -f $HOME/*.sh
 echo "Clean up old files done."
 
 wget -O $HOME/getting.sh "https://raw.githubusercontent.com/trunghieu1604/r1-sh/main/getting.sh"
-wget -O $HOME/vietbot.sh "https://raw.githubusercontent.com/trunghieu1604/r1-sh/main/voicebot.sh"
+wget -O $HOME/vietbot.sh "https://raw.githubusercontent.com/trunghieu1604/r1-sh/main/vietbot.sh"
 chmod +x $HOME/getting.sh
 chmod +x $HOME/vietbot.sh
 
