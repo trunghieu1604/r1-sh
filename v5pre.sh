@@ -5,13 +5,13 @@ rm -f $HOME/*.sh
 echo "Clean up old files done."
 
 wget -O $HOME/getting.sh "https://raw.githubusercontent.com/trunghieu1604/r1-sh/main/getting.sh"
-wget -O $HOME/vietbot.sh "https://raw.githubusercontent.com/trunghieu1604/r1-sh/main/vietbot.sh"
+wget -O $HOME/vietbot.sh "https://raw.githubusercontent.com/trunghieu1604/r1-sh/main/voicebot.sh"
 chmod +x $HOME/getting.sh
 chmod +x $HOME/vietbot.sh
 
 echo "[1/2] Chuan bi cai dat..."
 $HOME/getting.sh
-echo "[2/2] Cai dat Vietbot..."
+echo "[2/2] Cai dat Voicebot..."
 $HOME/vietbot.sh || true
 echo "Cai dat hoan tat."
 echo "Doi thiet bi khoi lai xong."
