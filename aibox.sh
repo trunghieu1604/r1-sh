@@ -5,16 +5,14 @@ ADB_DEVICE_PORT="5555"
 ADB_DEVICE="$ADB_DEVICE_IP:$ADB_DEVICE_PORT"
 ADB="adb"
 
-BASE_URL="https://github.com/thutrang0410/aio/releases/download/acb"
+BASE_URL="https://github.com/trunghieu1604/r1-sh/releases/download/abc"
 PACKAGE_NAME="info.dourok.voicebot"
 
-FREE_APK="free.apk"
-PREMIUM_APK="premium.apk"
 AIBOXPLUS_APK="aibox+.apk"
 DLNA_APK="auto-dlna.apk"
 UNI_SOUND_APK="uni-sound.apk"
 
-log_info() { echo "[PHICOMM-R1] $*"; }
+log_info() { echo "[TRUNGHIEU] $*"; }
 
 open_browser() {
     URL="http://192.168.43.1:8081"
@@ -24,7 +22,7 @@ open_browser() {
 
     elif command -v apk >/dev/null 2>&1; then
         echo "====================================="
-        echo "Truy cập Safari và mở:"
+        echo "Truy cập trình duyệt và mở:"
         echo "$URL"
         echo "====================================="
 
@@ -90,7 +88,7 @@ wait_for_wifi() {
     local prompt_shown=0
     while ! ping -c 1 -W 1 "$ADB_DEVICE_IP" >/dev/null 2>&1; do
         if [ "$prompt_shown" -eq 0 ]; then
-            echo "[PHICOMM-R1] Hãy kết nối tới Wifi của loa: Phicomm R1"
+            echo "[TRUNGHIEU] Hãy kết nối tới Wifi của loa: Phicomm R1"
             prompt_shown=1
         fi
         sleep 3
@@ -138,20 +136,18 @@ install_apk() {
 
 show_menu() {
     clear
+	echo "======================================="
+	echo "||           TRUNG HIẾU              ||"
     echo "======================================="
 	echo "||   CÀI ĐẶT AI - DLNA - UNISOUND    ||"
-	echo "||  1. [VIETBOT] FULL FREE - V1.2    ||"
-    echo "||  2. [VIETBOT] FULL PREMIUM - V1.2 ||"
-	echo "||  3. [AIBOX++] FULL - V5.1.3       ||"
+	echo "||  1. [AIBOX++] FULL - V5.1.3       ||"
 	echo "======================================="
 	echo "||          CHỈ CÀI MỖI AI           ||"
-	echo "||  4. [VIETBOT] FREE - V1.2         ||"
-    echo "||  5. [VIETBOT] PREMIUM - V1.2      ||"
-    echo "||  6. [AIBOX++] - V5.1.3            ||"
+    echo "||  2. [AIBOX++] - V5.1.3            ||"
 	echo "======================================="
     echo "||  0. Thoát                         ||"
     echo "======================================="
-    printf "Chọn số theo danh sách (0-6): "
+    printf "Chọn số theo danh sách (0-2): "
 }
 
 main() {
@@ -160,11 +156,9 @@ main() {
         show_menu
         read choice < /dev/tty
         case $choice in
-            1|2|3)
+            1)
         case "$choice" in
-            1) APK=$FREE_APK ;;
-            2) APK=$PREMIUM_APK ;;
-			3) APK=$AIBOXPLUS_APK ;;
+			1) APK=$AIBOXPLUS_APK ;;
         esac
                 echo ""
                 echo "[1/2] Chuẩn bị tải file."
@@ -198,11 +192,9 @@ main() {
                 
                 exit 0
                 ;;	
-            4|5|6)
+            2)
         case "$choice" in
-            4) APK=$FREE_APK ;;
-            5) APK=$PREMIUM_APK ;;
-            6) APK=$AIBOXPLUS_APK ;;
+            2) APK=$AIBOXPLUS_APK ;;
         esac
                 echo ""
                 echo "[1/2] Chuẩn bị tải file cập nhật."
