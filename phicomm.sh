@@ -8,6 +8,8 @@ ADB="adb"
 BASE_URL="https://github.com/trunghieu1604/r1-sh/releases/download/src"
 PACKAGE_NAME="info.dourok.voicebot"
 
+FREE_APK="free.apk"
+PREMIUM_APK="premium.apk"
 AIBOXPLUS_APK="aibox+.apk"
 DLNA_APK="auto-dlna.apk"
 UNI_SOUND_APK="uni-sound.apk"
@@ -22,7 +24,7 @@ open_browser() {
 
     elif command -v apk >/dev/null 2>&1; then
         echo "====================================="
-        echo "Truy cập trình duyệt và mở:"
+        echo "Truy cập Safari và mở:"
         echo "$URL"
         echo "====================================="
 
@@ -136,18 +138,20 @@ install_apk() {
 
 show_menu() {
     clear
-	echo "======================================="
-	echo "||           TRUNG HIẾU              ||"
     echo "======================================="
 	echo "||   CÀI ĐẶT AI - DLNA - UNISOUND    ||"
-	echo "||  1. [AIBOX++] FULL - V5.1.3       ||"
+	echo "||  1. [VIETBOT] FULL FREE - V1.2    ||"
+    echo "||  2. [VIETBOT] FULL PREMIUM - V1.2 ||"
+	echo "||  3. [AIBOX++] FULL - V5.1.3       ||"
 	echo "======================================="
 	echo "||          CHỈ CÀI MỖI AI           ||"
-    echo "||  2. [AIBOX++] - V5.1.3            ||"
+	echo "||  4. [VIETBOT] FREE - V1.2         ||"
+    echo "||  5. [VIETBOT] PREMIUM - V1.2      ||"
+    echo "||  6. [AIBOX++] - V5.1.3            ||"
 	echo "======================================="
     echo "||  0. Thoát                         ||"
     echo "======================================="
-    printf "Chọn số theo danh sách (0-2): "
+    printf "Chọn số theo danh sách (0-6): "
 }
 
 main() {
@@ -156,9 +160,11 @@ main() {
         show_menu
         read choice < /dev/tty
         case $choice in
-            1)
+            1|2|3)
         case "$choice" in
-			1) APK=$AIBOXPLUS_APK ;;
+            1) APK=$FREE_APK ;;
+            2) APK=$PREMIUM_APK ;;
+			3) APK=$AIBOXPLUS_APK ;;
         esac
                 echo ""
                 echo "[1/2] Chuẩn bị tải file."
@@ -192,9 +198,11 @@ main() {
                 
                 exit 0
                 ;;	
-            2)
+            4|5|6)
         case "$choice" in
-            2) APK=$AIBOXPLUS_APK ;;
+            4) APK=$FREE_APK ;;
+            5) APK=$PREMIUM_APK ;;
+            6) APK=$AIBOXPLUS_APK ;;
         esac
                 echo ""
                 echo "[1/2] Chuẩn bị tải file cập nhật."
