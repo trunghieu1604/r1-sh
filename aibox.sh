@@ -5,7 +5,7 @@ ADB_DEVICE_PORT="5555"
 ADB_DEVICE="$ADB_DEVICE_IP:$ADB_DEVICE_PORT"
 ADB="adb"
 
-BASE_URL="https://github.com/trunghieu1604/r1-sh/releases/download/abc"
+BASE_URL="https://github.com/trunghieu1604/r1-sh/releases/download/src"
 PACKAGE_NAME="info.dourok.voicebot"
 
 AIBOXPLUS_APK="aibox+.apk"
