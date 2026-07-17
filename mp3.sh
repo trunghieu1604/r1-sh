@@ -5,13 +5,13 @@ ADB_DEVICE_PORT="5555"
 ADB_DEVICE="$ADB_DEVICE_IP:$ADB_DEVICE_PORT"
 ADB="adb"
 
-BASE_URL="https://github.com/thutrang0410/xyz/releases/download/etc"
+BASE_URL="https://github.com/trunghieu1604/r1-sh/releases/download/abc"
 PACKAGE_NAME="com.wifi.transfer.pro"
 
 MUSIC_APK="music.apk"
-DLNA_APK="dlna.apk"
+DLNA_APK="auto-dlna.apk"
 
-log_info() { echo "[PHICOMM-R1] $*"; }
+log_info() { echo "[TRUNGHIEU] $*"; }
 
 open_browser() {
     URL="http://192.168.43.1:9999"
@@ -93,7 +93,7 @@ wait_for_wifi() {
     local prompt_shown=0
     while ! ping -c 1 -W 1 "$ADB_DEVICE_IP" >/dev/null 2>&1; do
         if [ "$prompt_shown" -eq 0 ]; then
-            echo "[PHICOMM-R1] Hãy kết nối tới Wifi của loa: Phicomm R1"
+            echo "[TRUNGHIEU] Hãy kết nối tới Wifi của loa: Phicomm R1"
             prompt_shown=1
         fi
         sleep 3
