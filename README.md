@@ -22,6 +22,6 @@ fi && wget -qO- https://raw.githubusercontent.com/trunghieu1604/r1-sh/main/mp3.s
 ***************************************************************************************
 **APK HỔ TRỢ**
 
-APK Quét IP R1: 🔽 **[Tải về](https://github.com/trunghieu1604/r1-sh/releases/download/src/Fing-R1.apk)**
+APK Quét IP R1: [![Tải về](https://img.shields.io/badge/Tải_về-blue?style=for-the-badge)](https://github.com/trunghieu1604/r1-sh/releases/download/src/Fing-R1.apk)
 
-APK Remote MP3: 🔽 **[Tải về](https://github.com/trunghieu1604/r1-sh/releases/download/src/remote.apk)**
+APK Remote MP3: [![Tải về](https://img.shields.io/badge/Tải_về-blue?style=for-the-badge)](https://github.com/trunghieu1604/r1-sh/releases/download/src/remote.apk)
