@@ -40,16 +40,16 @@ setup_env() {
     if [ -d "/data/data/com.termux" ]; then
         echo "=====> Cài qua Termux <====="
         pkg upgrade -y >/dev/null 2>&1
-        pkg install -y wget curl android-tools >/dev/null 2>&1
+        pkg install -y wget curl android-tools python >/dev/null 2>&1
 
     elif command -v apk >/dev/null 2>&1; then
         echo "=====> Cài qua iSH <====="
         apk update >/dev/null 2>&1
-        apk add wget curl android-tools >/dev/null 2>&1
+        apk add wget curl android-tools python3 >/dev/null 2>&1
 
     elif command -v brew >/dev/null 2>&1; then
         echo "=====> Cài qua macOS <====="
-        brew install wget curl android-platform-tools >/dev/null 2>&1
+        brew install wget curl android-platform-tools python3 >/dev/null 2>&1
 
     else
         echo "Không hỗ trợ môi trường này."
@@ -136,6 +136,207 @@ install_apk() {
     "$ADB" -s "$ADB_DEVICE" shell /system/bin/pm install -r "/data/local/tmp/$apk_file"
 }
 
+detect_local_ip() {
+    local ip=""
+    if command -v ip >/dev/null 2>&1; then
+        ip=$(ip route get 1.1.1.1 2>/dev/null | awk '{print $7}')
+    fi
+    if [ -z "$ip" ] && command -v ipconfig >/dev/null 2>&1; then
+        ip=$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null)
+    fi
+    if [ -z "$ip" ]; then
+        ip=$(hostname -I 2>/dev/null | awk '{print $1}')
+    fi
+    echo "$ip"
+}
+
+start_http_server() {
+    local dir="$1"
+    local port="$2"
+    local py_cmd=""
+    
+    if command -v python3 >/dev/null 2>&1; then
+        py_cmd="python3"
+    elif command -v python >/dev/null 2>&1; then
+        py_cmd="python"
+    else
+        log_info "Lỗi: Không tìm thấy Python để chạy HTTP Server!"
+        return 1
+    fi
+
+    local py_ver=$("$py_cmd" -c 'import sys; print(sys.version_info[0])' 2>/dev/null)
+
+    stop_http_server
+
+    log_info "Khởi chạy HTTP Server trên cổng $port..."
+    cd "$dir" || return 1
+    if [ "$py_ver" = "3" ]; then
+        "$py_cmd" -m http.server "$port" >/dev/null 2>&1 &
+    else
+        "$py_cmd" -m SimpleHTTPServer "$port" >/dev/null 2>&1 &
+    fi
+    local pid=$!
+    echo $pid > /tmp/r1_http.pid
+    log_info "HTTP Server đang chạy ngầm với PID $pid."
+}
+
+stop_http_server() {
+    if [ -f "/tmp/r1_http.pid" ]; then
+        local pid=$(cat /tmp/r1_http.pid)
+        if kill -0 "$pid" 2>/dev/null; then
+            log_info "Đang tắt HTTP Server cũ (PID $pid)..."
+            kill "$pid" 2>/dev/null
+            sleep 1
+        fi
+        rm -f /tmp/r1_http.pid
+    fi
+}
+
+upgrade_firmware() {
+    local fw_ver="$1"
+    local txt_file="ota-${fw_ver}.txt"
+    local zip_file="incremental-ota-${fw_ver}.zip"
+    
+    local upgrade_dir="$HOME/r1_upgrade"
+    mkdir -p "$upgrade_dir/firmware"
+    
+    log_info "Tải file cấu hình $txt_file..."
+    local txt_url="https://raw.githubusercontent.com/trunghieu1604/r1-sh/main/$txt_file"
+    progress_download "$txt_url" "$upgrade_dir/$txt_file" "$txt_file"
+    
+    log_info "Tải file zip firmware $zip_file..."
+    local zip_url="https://raw.githubusercontent.com/trunghieu1604/r1-sh/main/firmware/$zip_file"
+    progress_download "$zip_url" "$upgrade_dir/firmware/$zip_file" "$zip_file"
+
+    local def_ip=$(detect_local_ip)
+    printf "Nhập IP của máy tính [$def_ip]: "
+    read local_ip < /dev/tty
+    if [ -z "$local_ip" ]; then
+        local_ip="$def_ip"
+    fi
+    
+    printf "Nhập IP của loa R1 [$ADB_DEVICE_IP]: "
+    read r1_ip < /dev/tty
+    if [ -z "$r1_ip" ]; then
+        r1_ip="$ADB_DEVICE_IP"
+    fi
+
+    log_info "Cấu hình otaprop.txt..."
+    sed -e "s/REPLACEBYIP/${local_ip}:8080/" "$upgrade_dir/$txt_file" > "$upgrade_dir/otaprop.txt"
+
+    start_http_server "$upgrade_dir" 8080
+    if [ $? -ne 0 ]; then
+        log_info "Không thể khởi chạy HTTP Server. Tiến trình bị hủy."
+        return 1
+    fi
+
+    log_info "Kết nối ADB tới loa ($r1_ip)..."
+    "$ADB" disconnect >/dev/null 2>&1
+    "$ADB" kill-server >/dev/null 2>&1
+    "$ADB" connect "$r1_ip:5555" >/dev/null 2>&1
+    
+    local connected=0
+    for i in 1 2 3 4 5; do
+        if "$ADB" devices | grep -q "$r1_ip.*device"; then
+            connected=1
+            break
+        fi
+        sleep 2
+    done
+    
+    if [ "$connected" -eq 0 ]; then
+        log_info "Lỗi: Không thể kết nối ADB tới loa $r1_ip"
+        stop_http_server
+        return 1
+    fi
+
+    log_info "Đang đẩy otaprop.txt lên loa..."
+    "$ADB" -s "$r1_ip:5555" push "$upgrade_dir/otaprop.txt" "/sdcard/otaprop.txt"
+    log_info "Khởi động lại loa để tiến hành cập nhật..."
+    "$ADB" -s "$r1_ip:5555" reboot
+
+    echo "=========================================================="
+    echo " Loa Phicomm R1 đang khởi động lại."
+    echo " Hãy dùng điện thoại / trình duyệt cấu hình Wi-Fi cho loa."
+    echo " Sau khi kết nối Wi-Fi, loa sẽ tự tải và cài đặt ROM."
+    echo " KHÔNG ĐƯỢC TẮT nguồn loa hay tắt máy tính lúc này!"
+    echo " Sau khi nâng cấp xong, hãy chạy Option 8 để dọn dẹp."
+    echo "=========================================================="
+    printf "Nhấn Enter để quay lại menu..."
+    read temp < /dev/tty
+}
+
+cleanup_upgrade() {
+    stop_http_server
+    
+    printf "Nhập IP của loa R1 [$ADB_DEVICE_IP]: "
+    read r1_ip < /dev/tty
+    if [ -z "$r1_ip" ]; then
+        r1_ip="$ADB_DEVICE_IP"
+    fi
+
+    log_info "Kết nối ADB tới loa ($r1_ip) để dọn dẹp..."
+    "$ADB" disconnect >/dev/null 2>&1
+    "$ADB" kill-server >/dev/null 2>&1
+    "$ADB" connect "$r1_ip:5555" >/dev/null 2>&1
+    
+    local connected=0
+    for i in 1 2 3 4 5; do
+        if "$ADB" devices | grep -q "$r1_ip.*device"; then
+            connected=1
+            break
+        fi
+        sleep 2
+    done
+
+    if [ "$connected" -eq 1 ]; then
+        log_info "Xóa otaprop.txt trên loa..."
+        "$ADB" -s "$r1_ip:5555" shell rm "/sdcard/otaprop.txt"
+        log_info "Đã xóa xong."
+    else
+        log_info "Không thể kết nối ADB để tự động xóa file trên loa."
+        log_info "Hãy đảm bảo loa đã bật và kết nối cùng mạng, sau đó chạy lại Option 8."
+    fi
+
+    local upgrade_dir="$HOME/r1_upgrade"
+    if [ -d "$upgrade_dir" ]; then
+        log_info "Xóa các file tải tạm cục bộ..."
+        rm -rf "$upgrade_dir"
+    fi
+    log_info "Hoàn tất dọn dẹp."
+    printf "Nhấn Enter để quay lại menu..."
+    read temp < /dev/tty
+}
+
+upgrade_firmware_menu() {
+    while true; do
+        clear
+        echo "======================================="
+        echo "||    CHỌN PHIÊN BẢN CẦN NÂNG CẤP    ||"
+        echo "||  1. ota-3119-3166                 ||"
+        echo "||  2. ota-3166-3415                 ||"
+        echo "||  3. ota-3174-3318                 ||"
+        echo "||  4. ota-3318-3331                 ||"
+        echo "||  5. ota-3331-3448                 ||"
+        echo "||  6. ota-3415-3448                 ||"
+        echo "||  0. Quay lại                      ||"
+        echo "======================================="
+        printf "Chọn phiên bản (0-6): "
+        read fw_choice < /dev/tty
+        
+        case $fw_choice in
+            1) upgrade_firmware "3119-3166"; break ;;
+            2) upgrade_firmware "3166-3415"; break ;;
+            3) upgrade_firmware "3174-3318"; break ;;
+            4) upgrade_firmware "3318-3331"; break ;;
+            5) upgrade_firmware "3331-3448"; break ;;
+            6) upgrade_firmware "3415-3448"; break ;;
+            0) break ;;
+            *) echo "Lựa chọn không hợp lệ!"; sleep 1 ;;
+        esac
+    done
+}
+
 show_menu() {
     clear
     echo "======================================="
@@ -149,9 +350,13 @@ show_menu() {
     echo "||  5. [VIETBOT] PREMIUM - V1.2      ||"
     echo "||  6. [AIBOX++] - V5.1.3            ||"
 	echo "======================================="
+	echo "||        NÂNG CẤP FIRMWARE R1       ||"
+	echo "||  7. Nâng cấp Firmware R1          ||"
+	echo "||  8. Dọn dẹp otaprop & Tắt server  ||"
+	echo "======================================="
     echo "||  0. Thoát                         ||"
     echo "======================================="
-    printf "Chọn số theo danh sách (0-6): "
+    printf "Chọn số theo danh sách (0-8): "
 }
 
 main() {
@@ -225,6 +430,12 @@ main() {
                 sleep 1
                 open_browser
                 exit 0
+                ;;
+            7)
+                upgrade_firmware_menu
+                ;;
+            8)
+                cleanup_upgrade
                 ;;
 			0) exit 0 ;;
             *) echo "Lựa chọn không hợp lệ!"; sleep 2 ;;
