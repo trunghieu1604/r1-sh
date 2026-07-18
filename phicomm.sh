@@ -484,7 +484,7 @@ config_wifi() {
     echo "||2. Kết nối thiết bị chạy script này||"
     echo "||này vào Wifi Loa (Phicomm_R1_XXXX).||"
 	echo "||3. Chuyển bàn phím về tiếng Anh nếu||"
-	echo "||như chạy script này bằng >>TERMUX<<||"
+	echo "||như chạy script này bằng TERMUX    ||"
     echo "======================================="
     
     printf "Nhập tên Wi-Fi (SSID): "
