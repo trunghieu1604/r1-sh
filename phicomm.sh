@@ -428,7 +428,7 @@ upgrade_firmware() {
     echo "|| Loa sẽ tự động kết nối lại Wifi và bắt đầu tải ROM.  ||"
     echo "|| Vui lòng giữ cả Loa và Thiết bị chạy script luôn bật!||"
     echo "|| KHÔNG ĐƯỢC TẮT NGUỒN LOA VÀ THIẾT BỊ CHẠY SCRIPT NÀY ||"
-    echo "|| Sau khi nâng cấp xong, hãy chạy Option 7 để dọn dẹp.   ||"
+    echo "|| Sau khi nâng cấp xong, hãy chạy Option 7 để dọn dẹp. ||"
     echo "=========================================================="
     printf "Nhấn Enter để quay lại menu..."
     read -r temp
