@@ -425,10 +425,10 @@ upgrade_firmware() {
 
     echo "=========================================================="
     echo "|| Loa Phicomm R1 đang khởi động lại.                   ||"
-    echo "|| Dùng điện thoại / trình duyệt cấu hình Wi-Fi cho loa.||"
-    echo "|| Sau khi kết nối Wi-Fi, loa sẽ tự tải và cài đặt FW.  ||"
-    echo "|| KHÔNG ĐƯỢC TẮT NGUỒN LOA VÀ TẮT THIẾT BỊ CHẠY SCRIPT ||"
-    echo "|| Sau khi nâng cấp xong, hãy chạy Option 7 để dọn dẹp. ||"
+    echo "|| Loa sẽ tự động kết nối lại Wifi và bắt đầu tải ROM.  ||"
+    echo "|| Vui lòng giữ cả Loa và Thiết bị chạy script luôn bật!||"
+    echo "|| KHÔNG ĐƯỢC TẮT NGUỒN LOA VÀ THIẾT BỊ CHẠY SCRIPT NÀY ||"
+    echo "|| Sau khi nâng cấp xong, hãy chạy Option 7 để dọn dẹp.   ||"
     echo "=========================================================="
     printf "Nhấn Enter để quay lại menu..."
     read -r temp
