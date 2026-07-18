@@ -42,6 +42,19 @@ setup_env() {
 
     if [ -d "/data/data/com.termux" ]; then
         echo "=====> Cài qua Termux <====="
+        
+        local termux_dir="$HOME/.termux"
+        local prop_file="$termux_dir/termux.properties"
+        mkdir -p "$termux_dir"
+        if [ ! -f "$prop_file" ]; then
+            echo "enforce-char-based-input = true" > "$prop_file"
+            termux-reload-settings >/dev/null 2>&1
+        elif ! grep -q "^[[:space:]]*enforce-char-based-input[[:space:]]*=[[:space:]]*true" "$prop_file"; then
+            sed -i 's/^[[:space:]]*enforce-char-based-input.*/# &/' "$prop_file" 2>/dev/null
+            echo "enforce-char-based-input = true" >> "$prop_file"
+            termux-reload-settings >/dev/null 2>&1
+        fi
+
         pkg upgrade -y >/dev/null 2>&1
         pkg install -y wget curl android-tools >/dev/null 2>&1
 
@@ -150,6 +163,57 @@ install_apk() {
     "$ADB" -s "$ADB_DEVICE" shell rm "/data/local/tmp/$apk_file"
 }
 
+config_wifi() {
+    clear
+    echo "======================================="
+    echo "||      CẤU HÌNH WI-FI CHO LOA R1    ||"
+    echo "======================================="
+    echo "||        HƯỚNG DẪN CẤU HÌNH         ||"
+    echo "||1. Giữ nút trên Loa R1 khoảng 6s   ||"
+    echo "||đến khi đèn dưới nháy LED trắng    ||"
+    echo "||2. Kết nối thiết bị chạy script này||"
+    echo "||này vào Wifi Loa (Phicomm_R1_XXXX).||"
+    echo "||3. Chuyển bàn phím về tiếng Anh nếu||"
+    echo "||như chạy script này bằng TERMUX    ||"
+    echo "======================================="
+    
+    printf "Nhập tên Wi-Fi (SSID): "
+    read -r ssid
+    if [ -z "$ssid" ]; then
+        echo "Tên Wi-Fi không được để trống!"
+        sleep 2
+        return 1
+    fi
+    
+    printf "Nhập mật khẩu: "
+    read -r password
+    
+    local secure="WPA"
+    if [ -z "$password" ]; then
+        secure="INSECURE"
+    fi
+    
+    log_info "Đang gửi cấu hình wifi tới R1..."
+    
+    local response=$(curl -s -w "\n%{http_code}" -X POST -H "Content-Type: application/json" \
+        -d "{\"ssid\":\"$ssid\",\"secure\":\"$secure\",\"password\":\"$password\",\"mac\":\"\"}" \
+        "http://192.168.43.1:8989/api/configwifi")
+        
+    local http_code=$(echo "$response" | tail -n1)
+    
+    if [ "$http_code" -eq 200 ] 2>/dev/null; then
+        echo ""
+        log_info "Gửi cấu hình thành công! Vui lòng chờ loa kết nối khoảng 10s."
+    else
+        echo ""
+        log_info "Lỗi: Không thể gửi cấu hình tới loa."
+        log_info "Hãy chắc chắn đã kết nối vào Wifi của loa."
+    fi
+    
+    printf "Nhấn Enter để quay lại menu..."
+    read -r temp
+}
+
 show_menu() {
     clear
     echo "======================================="
@@ -165,10 +229,12 @@ show_menu() {
 }
 
 main() {
+    exec < /dev/tty
+    stty echo 2>/dev/null
     setup_env
     while true; do
         show_menu
-        read choice < /dev/tty
+        read -r choice
         case $choice in
             1)
                 APK=$MUSIC_APK
@@ -194,11 +260,8 @@ main() {
                 "$ADB" -s "$ADB_DEVICE" shell settings put secure install_non_market_apps 1
                 
                 echo ""
-                log_info "Đang khởi động lại loa..."
-				log_info "Cài đặt hoàn tất."
-				log_info "Vào wifi Phicomm R1, truy cập 192.168.43.1:9999 để cấu hình Wi-Fi cho thiết bị."
-                sleep 2
-                "$ADB" -s "$ADB_DEVICE" reboot             
+                log_info "Cài đặt hoàn tất."
+                config_wifi
                 exit 0
                 ;;	
             2)
@@ -219,10 +282,8 @@ main() {
                 launch
                 
                 echo ""
-				echo "Đang mở trang cấu hình..."
-                echo "Cài đặt hoàn tất."
-                sleep 1
-                open_browser
+                log_info "Cài đặt hoàn tất."
+                config_wifi
                 exit 0
                 ;;
 			0) exit 0 ;;
