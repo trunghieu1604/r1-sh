@@ -319,6 +319,11 @@ upgrade_firmware_menu() {
         fi
         if [ -z "$current_ver" ]; then
             current_ver="Không xác định"
+        else
+            local clean_ver=$(echo "$current_ver" | grep -o '[0-9]\{4\}$')
+            if [ -n "$clean_ver" ]; then
+                current_ver="$clean_ver"
+            fi
         fi
     fi
 
