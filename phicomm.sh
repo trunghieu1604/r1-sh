@@ -11,7 +11,6 @@ PACKAGE_NAME="info.dourok.voicebot"
 
 FREE_APK="free.apk"
 PREMIUM_APK="premium.apk"
-AIBOXPLUS_APK="aibox+.apk"
 DLNA_APK="auto-dlna.apk"
 UNI_SOUND_APK="uni-sound.apk"
 
@@ -429,7 +428,7 @@ upgrade_firmware() {
     echo "|| Dùng điện thoại / trình duyệt cấu hình Wi-Fi cho loa.||"
     echo "|| Sau khi kết nối Wi-Fi, loa sẽ tự tải và cài đặt FW.  ||"
     echo "|| KHÔNG ĐƯỢC TẮT NGUỒN LOA VÀ TẮT THIẾT BỊ CHẠY SCRIPT ||"
-    echo "|| Sau khi nâng cấp xong, hãy chạy Option 8 để dọn dẹp. ||"
+    echo "|| Sau khi nâng cấp xong, hãy chạy Option 7 để dọn dẹp. ||"
     echo "=========================================================="
     printf "Nhấn Enter để quay lại menu..."
     read -r temp
@@ -598,7 +597,7 @@ show_menu() {
 	echo "||        CẤU HÌNH & NÂNG CẤP LOA    ||"
 	echo "||  5. Cấu hình Wi-Fi cho loa R1     ||"
 	echo "||  6. Nâng cấp Firmware R1          ||"
-	echo "||  7. Dọn dẹp otaprop & Tắt server  ||"
+	echo "||  7. Xoá Cấu hình cũ & Tắt Server  ||"
 	echo "======================================="
     echo "||  0. Thoát                         ||"
     echo "======================================="
