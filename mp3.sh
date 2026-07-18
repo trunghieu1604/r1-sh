@@ -181,6 +181,8 @@ config_wifi() {
     if [ "$http_code" -eq 200 ] 2>/dev/null; then
         echo ""
         log_info "Gửi cấu hình thành công! Vui lòng chờ loa kết nối khoảng 10s."
+        log_info "Đang khởi động lại loa..."
+        "$ADB" -s "$ADB_DEVICE" reboot >/dev/null 2>&1
         log_info "Cài đặt hoàn tất."
     else
         echo ""
