@@ -298,7 +298,7 @@ select_r1_ip() {
     if [ -n "$scanned_ips" ]; then
         clear
         echo "========================================="
-        echo "||  TÌM THẤY THIẾT BỊ MỞ CỔNG ADB 5555 ||"
+        echo "||           TÌM THẤY THIẾT BỊ          ||"
         
         local i=1
         for ip in $scanned_ips; do
