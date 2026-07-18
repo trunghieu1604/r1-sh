@@ -11,6 +11,7 @@ PACKAGE_NAME="info.dourok.voicebot"
 
 FREE_APK="free.apk"
 PREMIUM_APK="premium.apk"
+AIBOXPLUS_APK="aibox+.apk"
 DLNA_APK="auto-dlna.apk"
 UNI_SOUND_APK="uni-sound.apk"
 
@@ -82,6 +83,19 @@ open_browser() {
 setup_env() {
     if [ -d "/data/data/com.termux" ]; then
         echo "=====> Cài qua Termux <====="
+        
+        local termux_dir="$HOME/.termux"
+        local prop_file="$termux_dir/termux.properties"
+        mkdir -p "$termux_dir"
+        if [ ! -f "$prop_file" ]; then
+            echo "enforce-char-based-input = true" > "$prop_file"
+            termux-reload-settings >/dev/null 2>&1
+        elif ! grep -q "^[[:space:]]*enforce-char-based-input[[:space:]]*=[[:space:]]*true" "$prop_file"; then
+            sed -i 's/^[[:space:]]*enforce-char-based-input.*/# &/' "$prop_file" 2>/dev/null
+            echo "enforce-char-based-input = true" >> "$prop_file"
+            termux-reload-settings >/dev/null 2>&1
+        fi
+
         pkg install -y wget curl android-tools python >/dev/null 2>&1
 
     elif command -v apk >/dev/null 2>&1; then
@@ -415,7 +429,7 @@ upgrade_firmware() {
     echo "|| Dùng điện thoại / trình duyệt cấu hình Wi-Fi cho loa.||"
     echo "|| Sau khi kết nối Wi-Fi, loa sẽ tự tải và cài đặt FW.  ||"
     echo "|| KHÔNG ĐƯỢC TẮT NGUỒN LOA VÀ TẮT THIẾT BỊ CHẠY SCRIPT ||"
-    echo "|| Sau khi nâng cấp xong, hãy chạy Option 7 để dọn dẹp. ||"
+    echo "|| Sau khi nâng cấp xong, hãy chạy Option 8 để dọn dẹp. ||"
     echo "=========================================================="
     printf "Nhấn Enter để quay lại menu..."
     read -r temp
@@ -584,7 +598,7 @@ show_menu() {
 	echo "||        CẤU HÌNH & NÂNG CẤP LOA    ||"
 	echo "||  5. Cấu hình Wi-Fi cho loa R1     ||"
 	echo "||  6. Nâng cấp Firmware R1          ||"
-	echo "||  7. Xoá FW cũ & Tắt server        ||"
+	echo "||  7. Dọn dẹp otaprop & Tắt server  ||"
 	echo "======================================="
     echo "||  0. Thoát                         ||"
     echo "======================================="
