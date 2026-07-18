@@ -487,7 +487,7 @@ config_wifi() {
 	echo "||như chạy script bằng Termux        ||"
     echo "======================================="
     
-    printf "Nhập tên Wi-Fi (SSID) muốn loa kết nối: "
+    printf "Nhập tên Wi-Fi (SSID): "
     read -r ssid
     if [ -z "$ssid" ]; then
         echo "Tên Wi-Fi không được để trống!"
@@ -495,7 +495,7 @@ config_wifi() {
         return 1
     fi
     
-    printf "Nhập mật khẩu Wi-Fi (để trống nếu không mật khẩu): "
+    printf "Nhập mật khẩu: "
     read -r password
     
     local secure="WPA"
@@ -503,7 +503,7 @@ config_wifi() {
         secure="INSECURE"
     fi
     
-    log_info "Đang gửi cấu hình mạng tới loa R1..."
+    log_info "Đang gửi cấu hình wifi tới R1..."
     
     local response=$(curl -s -w "\n%{http_code}" -X POST -H "Content-Type: application/json" \
         -d "{\"ssid\":\"$ssid\",\"secure\":\"$secure\",\"password\":\"$password\",\"mac\":\"\"}" \
@@ -513,12 +513,11 @@ config_wifi() {
     
     if [ "$http_code" -eq 200 ] 2>/dev/null; then
         echo ""
-        log_info "Gửi cấu hình thành công! Loa sẽ tự kết nối và khởi động lại."
-        log_info "Hãy kết nối thiết bị của bạn trở lại mạng Wifi nhà."
+        log_info "Gửi cấu hình thành công! Vui lòng chờ loa kết nối khoảng 10s."
     else
         echo ""
         log_info "Lỗi: Không thể gửi cấu hình tới loa (HTTP Code: $http_code)."
-        log_info "Hãy chắc chắn bạn đã kết nối vào đúng Wifi của loa (Phicomm_R1_XXXX)."
+        log_info "Hãy chắc chắn đã kết nối vào Wifi của loa (Phicomm_R1_XXXX)."
     fi
     
     printf "Nhấn Enter để quay lại menu..."
