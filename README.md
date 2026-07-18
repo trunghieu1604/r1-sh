@@ -26,3 +26,4 @@ fi && wget -qO- https://raw.githubusercontent.com/trunghieu1604/r1-sh/main/mp3.s
 
 **QUÉT IP R1**: [![Tải về](https://img.shields.io/badge/T%E1%BA%A3i%20v%E1%BB%81-0078D4?style=flat-square)](https://github.com/trunghieu1604/r1-sh/releases/download/src/Fing-R1.apk)
 
+**REMOTE R1** : [![Tải về](https://img.shields.io/badge/T%E1%BA%A3i%20v%E1%BB%81-0078D4?style=flat-square)](https://github.com/trunghieu1604/r1-sh/releases/download/src/remote.apk)
