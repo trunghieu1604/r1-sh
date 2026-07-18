@@ -16,9 +16,13 @@ UNI_SOUND_APK="uni-sound.apk"
 
 log_info() { echo "[TRUNGHIEU] $*"; }
 
+get_char_len() {
+    printf "%s" "$1" | tr -d '\200-\277' | wc -c
+}
+
 print_menu_line() {
     local text="$1"
-    local len=${#text}
+    local len=$(get_char_len "$text")
     local total_spaces=$((35 - len))
     if [ "$total_spaces" -lt 0 ]; then
         total_spaces=0
@@ -45,7 +49,7 @@ print_menu_line() {
 
 print_left_menu_line() {
     local text="$1"
-    local len=${#text}
+    local len=$(get_char_len "$text")
     local remaining_spaces=$((33 - len))
     if [ "$remaining_spaces" -lt 0 ]; then
         remaining_spaces=0
@@ -276,14 +280,26 @@ import socket
 from threading import Thread
 import sys
 
-try:
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.connect(("1.1.1.1", 80))
-    local_ip = s.getsockname()[0]
-    s.close()
-except:
-    sys.exit(1)
+def get_ip():
+    for target in [("8.8.8.8", 80), ("192.168.43.1", 80), ("192.168.1.1", 80)]:
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.connect(target)
+            ip = s.getsockname()[0]
+            s.close()
+            if ip and ip != "127.0.0.1":
+                return ip
+        except:
+            pass
+    try:
+        ip = socket.gethostbyname(socket.gethostname())
+        if ip and ip != "127.0.0.1":
+            return ip
+    except:
+        pass
+    return "192.168.43.1"
 
+local_ip = get_ip()
 ip_parts = local_ip.split(".")
 if len(ip_parts) != 4:
     sys.exit(1)
@@ -292,7 +308,7 @@ subnet = ".".join(ip_parts[:3])
 found = []
 def check_ip(ip):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.settimeout(0.4)
+    s.settimeout(1.2)
     result = s.connect_ex((ip, 5555))
     if result == 0:
         found.append(ip)
