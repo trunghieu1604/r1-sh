@@ -528,11 +528,11 @@ upgrade_firmware_menu() {
     while true; do
         clear
         echo "======================================="
-        echo "||    CẦN CẤU HÌNH WIFI TRƯỚC KHI"   ||"
-        echo "||         TIẾN HÀNH NÂNG CẤP        ||"
+        echo "||    CẦN CẤU HÌNH WIFI TRƯỚC KHI    ||"
+        echo "||        TIẾN HÀNH NÂNG CẤP         ||"
         echo "======================================="
-        echo "|| 1. Đã cấu hình wifi."             ||"
-        echo "|| 0. Chưa cấu hình wifi / Quay lại" ||"
+        echo "||  1. Đã cấu hình wifi.             ||"
+        echo "||  0. Chưa cấu hình wifi / Quay lại ||"
         echo "======================================="
         printf "Chọn (1 hoặc 0): "
         read -r wifi_check
