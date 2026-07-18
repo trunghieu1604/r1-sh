@@ -445,6 +445,57 @@ cleanup_upgrade() {
     read temp < /dev/tty
 }
 
+config_wifi() {
+    clear
+    echo "======================================="
+    echo "||      CẤU HÌNH WI-FI CHO LOA R1    ||"
+    echo "======================================="
+    echo " Hướng dẫn:"
+    echo " 1. Nhấn giữ nút trên đỉnh loa R1 khoảng 5 giây"
+    echo "    đến khi loa báo 'Bắt đầu cấu hình mạng'"
+    echo "    và đèn dưới đáy nhấp nháy trắng."
+    echo " 2. Kết nối máy tính/điện thoại chạy script"
+    echo "    này vào mạng Wifi của loa (Phicomm_R1_XXXX)."
+    echo "======================================="
+    
+    printf "Nhập tên Wi-Fi (SSID) muốn loa kết nối: "
+    read ssid < /dev/tty
+    if [ -z "$ssid" ]; then
+        echo "Tên Wi-Fi không được để trống!"
+        sleep 2
+        return 1
+    fi
+    
+    printf "Nhập mật khẩu Wi-Fi (để trống nếu không mật khẩu): "
+    read password < /dev/tty
+    
+    local secure="WPA"
+    if [ -z "$password" ]; then
+        secure="INSECURE"
+    fi
+    
+    log_info "Đang gửi cấu hình mạng tới loa R1..."
+    
+    local response=$(curl -s -w "\n%{http_code}" -X POST -H "Content-Type: application/json" \
+        -d "{\"ssid\":\"$ssid\",\"secure\":\"$secure\",\"password\":\"$password\",\"mac\":\"\"}" \
+        "http://192.168.43.1:8989/api/configwifi")
+        
+    local http_code=$(echo "$response" | tail -n1)
+    
+    if [ "$http_code" -eq 200 ] 2>/dev/null; then
+        echo ""
+        log_info "Gửi cấu hình thành công! Loa sẽ tự kết nối và khởi động lại."
+        log_info "Hãy kết nối thiết bị của bạn trở lại mạng Wifi nhà."
+    else
+        echo ""
+        log_info "Lỗi: Không thể gửi cấu hình tới loa (HTTP Code: $http_code)."
+        log_info "Hãy chắc chắn bạn đã kết nối vào đúng Wifi của loa (Phicomm_R1_XXXX)."
+    fi
+    
+    printf "Nhấn Enter để quay lại menu..."
+    read temp < /dev/tty
+}
+
 upgrade_firmware_menu() {
     local current_ver="Chưa kết nối"
     select_r1_ip
@@ -516,13 +567,14 @@ show_menu() {
 	echo "||  3. [VIETBOT] FREE - V1.2         ||"
     echo "||  4. [VIETBOT] PREMIUM - V1.2      ||"
 	echo "======================================="
-	echo "||        NÂNG CẤP FIRMWARE R1       ||"
-	echo "||  5. Nâng cấp Firmware R1          ||"
-	echo "||  6. Dọn dẹp otaprop & Tắt server  ||"
+	echo "||        CẤU HÌNH & NÂNG CẤP LOA    ||"
+	echo "||  5. Cấu hình Wi-Fi cho loa R1     ||"
+	echo "||  6. Nâng cấp Firmware R1          ||"
+	echo "||  7. Dọn dẹp otaprop & Tắt server  ||"
 	echo "======================================="
     echo "||  0. Thoát                         ||"
     echo "======================================="
-    printf "Chọn số theo danh sách (0-6): "
+    printf "Chọn số theo danh sách (0-7): "
 }
 
 main() {
@@ -596,9 +648,12 @@ main() {
                 exit 0
                 ;;
             5)
-                upgrade_firmware_menu
+                config_wifi
                 ;;
             6)
+                upgrade_firmware_menu
+                ;;
+            7)
                 cleanup_upgrade
                 ;;
 			0) exit 0 ;;
