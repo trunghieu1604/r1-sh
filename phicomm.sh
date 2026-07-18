@@ -525,6 +525,25 @@ config_wifi() {
 }
 
 upgrade_firmware_menu() {
+    while true; do
+        clear
+        echo "======================================="
+        print_menu_line "CẦN CẤU HÌNH WIFI TRƯỚC KHI"
+        print_menu_line "TIẾN HÀNH NÂNG CẤP"
+        echo "======================================="
+        print_left_menu_line "1. Đã cấu hình wifi."
+        print_left_menu_line "0. Chưa cấu hình wifi / Quay lại"
+        echo "======================================="
+        printf "Chọn (1 hoặc 0): "
+        read -r wifi_check
+        
+        case "$wifi_check" in
+            1) break ;;
+            0) return 0 ;;
+            *) echo "Lựa chọn không hợp lệ!"; sleep 1 ;;
+        esac
+    done
+
     local current_ver="Chưa kết nối"
     select_r1_ip
     local target_ip="$CHOSEN_R1_IP"
