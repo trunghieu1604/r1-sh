@@ -18,7 +18,7 @@ log_info() { echo "[TRUNGHIEU] $*"; }
 
 print_menu_line() {
     local text="$1"
-    local len=$(printf "%s" "$text" | wc -m)
+    local len=${#text}
     local total_spaces=$((35 - len))
     if [ "$total_spaces" -lt 0 ]; then
         total_spaces=0
@@ -45,7 +45,7 @@ print_menu_line() {
 
 print_left_menu_line() {
     local text="$1"
-    local len=$(printf "%s" "$text" | wc -m)
+    local len=${#text}
     local remaining_spaces=$((33 - len))
     if [ "$remaining_spaces" -lt 0 ]; then
         remaining_spaces=0
