@@ -44,6 +44,22 @@ print_menu_line() {
     echo "||${left_pad}${text}${right_pad}||"
 }
 
+print_left_menu_line() {
+    local text="$1"
+    local len=$(printf "%s" "$text" | wc -m)
+    local remaining_spaces=$((33 - len))
+    if [ "$remaining_spaces" -lt 0 ]; then
+        remaining_spaces=0
+    fi
+    local right_pad=""
+    local j=0
+    while [ $j -lt $remaining_spaces ]; do
+        right_pad="${right_pad} "
+        j=$((j + 1))
+    done
+    echo "||  ${text}${right_pad}||"
+}
+
 open_browser() {
     URL="http://192.168.43.1:8081"
 
@@ -302,12 +318,12 @@ select_r1_ip() {
         
         local i=1
         for ip in $scanned_ips; do
-            print_menu_line "$i. $ip"
+            print_left_menu_line "$i. $ip"
             eval "ip_val_$i=\$ip"
             i=$((i + 1))
         done
         local total_found=$((i - 1))
-        print_menu_line "0. Nhập IP thủ công"
+        print_left_menu_line "0. Nhập IP thủ công"
         echo "======================================="
         printf "Chọn thiết bị (1-$total_found hoặc 0): "
         read ip_choice < /dev/tty
