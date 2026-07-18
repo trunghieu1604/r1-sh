@@ -17,6 +17,33 @@ UNI_SOUND_APK="uni-sound.apk"
 
 log_info() { echo "[TRUNGHIEU] $*"; }
 
+print_menu_line() {
+    local text="$1"
+    local len=$(printf "%s" "$text" | wc -m)
+    local total_spaces=$((35 - len))
+    if [ "$total_spaces" -lt 0 ]; then
+        total_spaces=0
+    fi
+    local left_spaces=$((total_spaces / 2))
+    local right_spaces=$((total_spaces - left_spaces))
+    
+    local left_pad=""
+    local right_pad=""
+    
+    local j=0
+    while [ $j -lt $left_spaces ]; do
+        left_pad="${left_pad} "
+        j=$((j + 1))
+    done
+    j=0
+    while [ $j -lt $right_spaces ]; do
+        right_pad="${right_pad} "
+        j=$((j + 1))
+    done
+    
+    echo "||${left_pad}${text}${right_pad}||"
+}
+
 open_browser() {
     URL="http://192.168.43.1:8081"
 
@@ -447,10 +474,10 @@ upgrade_firmware_menu() {
         echo "======================================="
         echo "||    CHỌN PHIÊN BẢN CẦN NÂNG CẤP    ||"
         echo "||  Phiên bản hiện tại của loa:      ||"
-        echo "||  >> $current_ver <<"
+        print_menu_line ">> $current_ver <<"
         case "$current_ver" in
             *3448*)
-                echo "||  (CẢNH BÁO: ĐÃ LÀ BẢN CAO NHẤT!)  ||"
+                print_menu_line "(CẢNH BÁO: ĐÃ LÀ BẢN CAO NHẤT!)"
                 ;;
         esac
         echo "||                                   ||"
