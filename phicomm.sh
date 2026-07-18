@@ -326,13 +326,13 @@ select_r1_ip() {
         print_left_menu_line "0. Nhập IP thủ công"
         echo "======================================="
         printf "Chọn thiết bị (1-$total_found hoặc 0): "
-        read ip_choice < /dev/tty
+        read -r ip_choice
         
         if [ "$ip_choice" -ge 1 ] 2>/dev/null && [ "$ip_choice" -le "$total_found" ] 2>/dev/null; then
             eval "CHOSEN_R1_IP=\$ip_val_$ip_choice"
         else
             printf "Nhập IP của loa R1 [$ADB_DEVICE_IP]: "
-            read user_ip < /dev/tty
+            read -r user_ip
             if [ -z "$user_ip" ]; then
                 CHOSEN_R1_IP="$ADB_DEVICE_IP"
             else
@@ -342,7 +342,7 @@ select_r1_ip() {
     else
         log_info "Không quét thấy loa tự động trong mạng nội bộ."
         printf "Nhập IP của loa R1 [$ADB_DEVICE_IP]: "
-        read user_ip < /dev/tty
+        read -r user_ip
         if [ -z "$user_ip" ]; then
             CHOSEN_R1_IP="$ADB_DEVICE_IP"
         else
@@ -369,7 +369,7 @@ upgrade_firmware() {
 
     local def_ip=$(detect_local_ip)
     printf "Nhập IP của máy tính [$def_ip]: "
-    read local_ip < /dev/tty
+    read -r local_ip
     if [ -z "$local_ip" ]; then
         local_ip="$def_ip"
     fi
@@ -419,7 +419,7 @@ upgrade_firmware() {
     echo "|| Sau khi nâng cấp xong, hãy chạy Option 8 để dọn dẹp. ||"
     echo "=========================================================="
     printf "Nhấn Enter để quay lại menu..."
-    read temp < /dev/tty
+    read -r temp
 }
 
 cleanup_upgrade() {
@@ -458,7 +458,7 @@ cleanup_upgrade() {
     fi
     log_info "Hoàn tất dọn dẹp."
     printf "Nhấn Enter để quay lại menu..."
-    read temp < /dev/tty
+    read -r temp
 }
 
 config_wifi() {
@@ -474,7 +474,7 @@ config_wifi() {
     echo "======================================="
     
     printf "Nhập tên Wi-Fi (SSID) muốn loa kết nối: "
-    read ssid < /dev/tty
+    read -r ssid
     if [ -z "$ssid" ]; then
         echo "Tên Wi-Fi không được để trống!"
         sleep 2
@@ -482,7 +482,7 @@ config_wifi() {
     fi
     
     printf "Nhập mật khẩu Wi-Fi (để trống nếu không mật khẩu): "
-    read password < /dev/tty
+    read -r password
     
     local secure="WPA"
     if [ -z "$password" ]; then
@@ -508,7 +508,7 @@ config_wifi() {
     fi
     
     printf "Nhấn Enter để quay lại menu..."
-    read temp < /dev/tty
+    read -r temp
 }
 
 upgrade_firmware_menu() {
@@ -556,7 +556,7 @@ upgrade_firmware_menu() {
         echo "||  0. Quay lại                      ||"
         echo "======================================="
         printf "Chọn phiên bản (0-6): "
-        read fw_choice < /dev/tty
+        read -r fw_choice
         
         case $fw_choice in
             1) upgrade_firmware "3119-3166"; break ;;
@@ -593,10 +593,11 @@ show_menu() {
 }
 
 main() {
+    exec < /dev/tty
     setup_env
     while true; do
         show_menu
-        read choice < /dev/tty
+        read -r choice
         case $choice in
             1|2)
         case "$choice" in
