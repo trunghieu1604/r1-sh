@@ -4,6 +4,7 @@ ADB_DEVICE_IP="192.168.43.1"
 ADB_DEVICE_PORT="5555"
 ADB_DEVICE="$ADB_DEVICE_IP:$ADB_DEVICE_PORT"
 ADB="adb"
+CHOSEN_R1_IP=""
 
 BASE_URL="https://github.com/trunghieu1604/r1-sh/releases/download/src"
 PACKAGE_NAME="info.dourok.voicebot"
@@ -253,10 +254,58 @@ for t in threads:
     t.join()
 
 if found:
-    print(found[0])
+    print(" ".join(found))
 ' 2>/dev/null)
 
     echo "$detected_ip"
+}
+
+select_r1_ip() {
+    if [ -n "$CHOSEN_R1_IP" ]; then
+        return 0
+    fi
+
+    log_info "Đang quét tìm loa R1 trong mạng nội bộ..."
+    local scanned_ips=$(scan_r1_ip)
+    
+    if [ -n "$scanned_ips" ]; then
+        clear
+        echo "========================================="
+        echo "||  TÌM THẤY THIẾT BỊ MỞ CỔNG ADB 5555 ||"
+        
+        local i=1
+        for ip in $scanned_ips; do
+            echo "||  $i. $ip"
+            eval "ip_val_$i=\$ip"
+            i=$((i + 1))
+        done
+        local total_found=$((i - 1))
+        echo "||  0. Nhập IP thủ công                 ||"
+        echo "========================================="
+        printf "Chọn thiết bị (1-$total_found hoặc 0): "
+        read ip_choice < /dev/tty
+        
+        if [ "$ip_choice" -ge 1 ] 2>/dev/null && [ "$ip_choice" -le "$total_found" ] 2>/dev/null; then
+            eval "CHOSEN_R1_IP=\$ip_val_$ip_choice"
+        else
+            printf "Nhập IP của loa R1 [$ADB_DEVICE_IP]: "
+            read user_ip < /dev/tty
+            if [ -z "$user_ip" ]; then
+                CHOSEN_R1_IP="$ADB_DEVICE_IP"
+            else
+                CHOSEN_R1_IP="$user_ip"
+            fi
+        fi
+    else
+        log_info "Không quét thấy loa tự động trong mạng nội bộ."
+        printf "Nhập IP của loa R1 [$ADB_DEVICE_IP]: "
+        read user_ip < /dev/tty
+        if [ -z "$user_ip" ]; then
+            CHOSEN_R1_IP="$ADB_DEVICE_IP"
+        else
+            CHOSEN_R1_IP="$user_ip"
+        fi
+    fi
 }
 
 upgrade_firmware() {
@@ -282,21 +331,8 @@ upgrade_firmware() {
         local_ip="$def_ip"
     fi
     
-    log_info "Đang quét tìm loa R1 trong mạng nội bộ..."
-    local scanned_ip=$(scan_r1_ip)
-    local def_r1_ip="$ADB_DEVICE_IP"
-    if [ -n "$scanned_ip" ]; then
-        log_info "Tìm thấy loa R1 tại IP: $scanned_ip"
-        def_r1_ip="$scanned_ip"
-    else
-        log_info "Không quét thấy loa tự động. Sử dụng IP mặc định $ADB_DEVICE_IP."
-    fi
-
-    printf "Nhập IP của loa R1 [$def_r1_ip]: "
-    read r1_ip < /dev/tty
-    if [ -z "$r1_ip" ]; then
-        r1_ip="$def_r1_ip"
-    fi
+    select_r1_ip
+    local r1_ip="$CHOSEN_R1_IP"
 
     log_info "Cấu hình otaprop.txt..."
     sed -e "s/REPLACEBYIP/${local_ip}:8080/" "$upgrade_dir/$txt_file" > "$upgrade_dir/otaprop.txt"
@@ -346,21 +382,8 @@ upgrade_firmware() {
 cleanup_upgrade() {
     stop_http_server
     
-    log_info "Đang quét tìm loa R1 trong mạng nội bộ..."
-    local scanned_ip=$(scan_r1_ip)
-    local def_r1_ip="$ADB_DEVICE_IP"
-    if [ -n "$scanned_ip" ]; then
-        log_info "Tìm thấy loa R1 tại IP: $scanned_ip"
-        def_r1_ip="$scanned_ip"
-    else
-        log_info "Không quét thấy loa tự động. Sử dụng IP mặc định $ADB_DEVICE_IP."
-    fi
-
-    printf "Nhập IP của loa R1 [$def_r1_ip]: "
-    read r1_ip < /dev/tty
-    if [ -z "$r1_ip" ]; then
-        r1_ip="$def_r1_ip"
-    fi
+    select_r1_ip
+    local r1_ip="$CHOSEN_R1_IP"
 
     log_info "Kết nối ADB tới loa ($r1_ip) để dọn dẹp..."
     "$ADB" disconnect >/dev/null 2>&1
@@ -397,20 +420,16 @@ cleanup_upgrade() {
 
 upgrade_firmware_menu() {
     local current_ver="Chưa kết nối"
-    log_info "Đang quét tìm loa R1 trong mạng nội bộ..."
-    local scanned_ip=$(scan_r1_ip)
-    local target_ip="$ADB_DEVICE_IP"
-    if [ -n "$scanned_ip" ]; then
-        target_ip="$scanned_ip"
-    fi
+    select_r1_ip
+    local target_ip="$CHOSEN_R1_IP"
 
     if check_port_5555 "$target_ip"; then
         log_info "Đang đọc thông tin từ loa ($target_ip)..."
         "$ADB" connect "$target_ip:5555" >/dev/null 2>&1
         if "$ADB" devices | grep -q "$target_ip.*device"; then
-            current_ver=$("$ADB" -s "$target_ip:5555" shell getprop ro.build.display.id 2>/dev/null | tr -d '\r\n')
-            if [ -z "$current_ver" ]; then
-                current_ver=$("$ADB" -s "$target_ip:5555" shell getprop ro.build.version.incremental 2>/dev/null | tr -d '\r\n')
+            current_ver=$("$ADB" -s "$target_ip:5555" shell getprop ro.build.version.incremental 2>/dev/null | tr -d '\r\n')
+            if [ -z "$current_ver" ] || [ "$current_ver" = "LMY49F release-keys" ]; then
+                current_ver=$("$ADB" -s "$target_ip:5555" shell getprop ro.build.display.id 2>/dev/null | tr -d '\r\n')
             fi
             if [ -z "$current_ver" ]; then
                 current_ver="Không xác định"
