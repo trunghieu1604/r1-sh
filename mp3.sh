@@ -186,6 +186,7 @@ config_wifi() {
     if [ "$http_code" -eq 200 ] 2>/dev/null; then
         echo ""
         log_info "Gửi cấu hình thành công! Vui lòng chờ loa kết nối khoảng 10s."
+        log_info "Cài đặt hoàn tất."
     else
         echo ""
         log_info "Lỗi: Không thể gửi cấu hình tới loa."
@@ -242,7 +243,6 @@ main() {
                 "$ADB" -s "$ADB_DEVICE" shell settings put secure install_non_market_apps 1
                 
                 echo ""
-                log_info "Cài đặt hoàn tất."
                 config_wifi
                 exit 0
                 ;;	
@@ -264,7 +264,6 @@ main() {
                 launch
                 
                 echo ""
-                log_info "Cài đặt hoàn tất."
                 config_wifi
                 exit 0
                 ;;
