@@ -594,6 +594,7 @@ show_menu() {
 
 main() {
     exec < /dev/tty
+    stty echo 2>/dev/null
     setup_env
     while true; do
         show_menu
