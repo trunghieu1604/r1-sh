@@ -516,8 +516,8 @@ config_wifi() {
         log_info "Gửi cấu hình thành công! Vui lòng chờ loa kết nối khoảng 10s."
     else
         echo ""
-        log_info "Lỗi: Không thể gửi cấu hình tới loa (HTTP Code: $http_code)."
-        log_info "Hãy chắc chắn đã kết nối vào Wifi của loa (Phicomm_R1_XXXX)."
+        log_info "Lỗi: Không thể gửi cấu hình tới loa."
+        log_info "Hãy chắc chắn đã kết nối vào Wifi của loa."
     fi
     
     printf "Nhấn Enter để quay lại menu..."
