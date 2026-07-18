@@ -309,10 +309,31 @@ cleanup_upgrade() {
 }
 
 upgrade_firmware_menu() {
+    local current_ver="Chưa kết nối"
+    log_info "Đang kiểm tra kết nối tới loa..."
+    "$ADB" connect "$ADB_DEVICE_IP:5555" >/dev/null 2>&1
+    if "$ADB" devices | grep -q "$ADB_DEVICE_IP.*device"; then
+        current_ver=$("$ADB" -s "$ADB_DEVICE_IP:5555" shell getprop ro.build.display.id 2>/dev/null | tr -d '\r\n')
+        if [ -z "$current_ver" ]; then
+            current_ver=$("$ADB" -s "$ADB_DEVICE_IP:5555" shell getprop ro.build.version.incremental 2>/dev/null | tr -d '\r\n')
+        fi
+        if [ -z "$current_ver" ]; then
+            current_ver="Không xác định"
+        fi
+    fi
+
     while true; do
         clear
         echo "======================================="
         echo "||    CHỌN PHIÊN BẢN CẦN NÂNG CẤP    ||"
+        echo "||  Phiên bản hiện tại của loa:      ||"
+        echo "||  >> $current_ver <<"
+        case "$current_ver" in
+            *3448*)
+                echo "||  (CẢNH BÁO: ĐÃ LÀ BẢN CAO NHẤT!)  ||"
+                ;;
+        esac
+        echo "||                                   ||"
         echo "||  1. ota-3119-3166                 ||"
         echo "||  2. ota-3166-3415                 ||"
         echo "||  3. ota-3174-3318                 ||"
@@ -332,7 +353,7 @@ upgrade_firmware_menu() {
             5) upgrade_firmware "3331-3448"; break ;;
             6) upgrade_firmware "3415-3448"; break ;;
             0) break ;;
-            *) echo "Lựa chọn không hợp lệ!"; sleep 1 ;;
+            * ) echo "Lựa chọn không hợp lệ!"; sleep 1 ;;
         esac
     done
 }
