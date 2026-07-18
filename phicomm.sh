@@ -297,18 +297,18 @@ select_r1_ip() {
     
     if [ -n "$scanned_ips" ]; then
         clear
-        echo "========================================="
-        echo "||           TÌM THẤY THIẾT BỊ          ||"
+        echo "======================================="
+        print_menu_line "TÌM THẤY THIẾT BỊ"
         
         local i=1
         for ip in $scanned_ips; do
-            echo "||  $i. $ip"
+            print_menu_line "$i. $ip"
             eval "ip_val_$i=\$ip"
             i=$((i + 1))
         done
         local total_found=$((i - 1))
-        echo "||  0. Nhập IP thủ công                 ||"
-        echo "========================================="
+        print_menu_line "0. Nhập IP thủ công"
+        echo "======================================="
         printf "Chọn thiết bị (1-$total_found hoặc 0): "
         read ip_choice < /dev/tty
         
