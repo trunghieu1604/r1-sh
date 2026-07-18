@@ -39,7 +39,6 @@ open_browser() {
 setup_env() {
     if [ -d "/data/data/com.termux" ]; then
         echo "=====> Cài qua Termux <====="
-        pkg upgrade -y >/dev/null 2>&1
         pkg install -y wget curl android-tools python >/dev/null 2>&1
 
     elif command -v apk >/dev/null 2>&1; then
@@ -192,6 +191,61 @@ stop_http_server() {
     fi
 }
 
+scan_r1_ip() {
+    local py_cmd=""
+    if command -v python3 >/dev/null 2>&1; then
+        py_cmd="python3"
+    elif command -v python >/dev/null 2>&1; then
+        py_cmd="python"
+    else
+        echo ""
+        return 1
+    fi
+
+    local detected_ip=$("$py_cmd" -c '
+import socket
+from threading import Thread
+import sys
+
+try:
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect(("1.1.1.1", 80))
+    local_ip = s.getsockname()[0]
+    s.close()
+except:
+    sys.exit(1)
+
+ip_parts = local_ip.split(".")
+if len(ip_parts) != 4:
+    sys.exit(1)
+subnet = ".".join(ip_parts[:3])
+
+found = []
+def check_ip(ip):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.settimeout(0.4)
+    result = s.connect_ex((ip, 5555))
+    if result == 0:
+        found.append(ip)
+    s.close()
+
+threads = []
+for i in range(1, 255):
+    ip = "%s.%d" % (subnet, i)
+    t = Thread(target=check_ip, args=(ip,))
+    t.start()
+    threads.append(t)
+
+for t in threads:
+    t.join()
+
+if found:
+    print(found[0])
+' 2>/dev/null)
+
+    echo "$detected_ip"
+}
+
 upgrade_firmware() {
     local fw_ver="$1"
     local txt_file="ota-${fw_ver}.txt"
@@ -215,10 +269,20 @@ upgrade_firmware() {
         local_ip="$def_ip"
     fi
     
-    printf "Nhập IP của loa R1 [$ADB_DEVICE_IP]: "
+    log_info "Đang quét tìm loa R1 trong mạng nội bộ..."
+    local scanned_ip=$(scan_r1_ip)
+    local def_r1_ip="$ADB_DEVICE_IP"
+    if [ -n "$scanned_ip" ]; then
+        log_info "Tìm thấy loa R1 tại IP: $scanned_ip"
+        def_r1_ip="$scanned_ip"
+    else
+        log_info "Không quét thấy loa tự động. Sử dụng IP mặc định $ADB_DEVICE_IP."
+    fi
+
+    printf "Nhập IP của loa R1 [$def_r1_ip]: "
     read r1_ip < /dev/tty
     if [ -z "$r1_ip" ]; then
-        r1_ip="$ADB_DEVICE_IP"
+        r1_ip="$def_r1_ip"
     fi
 
     log_info "Cấu hình otaprop.txt..."
@@ -269,10 +333,20 @@ upgrade_firmware() {
 cleanup_upgrade() {
     stop_http_server
     
-    printf "Nhập IP của loa R1 [$ADB_DEVICE_IP]: "
+    log_info "Đang quét tìm loa R1 trong mạng nội bộ..."
+    local scanned_ip=$(scan_r1_ip)
+    local def_r1_ip="$ADB_DEVICE_IP"
+    if [ -n "$scanned_ip" ]; then
+        log_info "Tìm thấy loa R1 tại IP: $scanned_ip"
+        def_r1_ip="$scanned_ip"
+    else
+        log_info "Không quét thấy loa tự động. Sử dụng IP mặc định $ADB_DEVICE_IP."
+    fi
+
+    printf "Nhập IP của loa R1 [$def_r1_ip]: "
     read r1_ip < /dev/tty
     if [ -z "$r1_ip" ]; then
-        r1_ip="$ADB_DEVICE_IP"
+        r1_ip="$def_r1_ip"
     fi
 
     log_info "Kết nối ADB tới loa ($r1_ip) để dọn dẹp..."
