@@ -484,20 +484,18 @@ show_menu() {
 	echo "||   CÀI ĐẶT AI - DLNA - UNISOUND    ||"
 	echo "||  1. [VIETBOT] FULL FREE - V1.2    ||"
     echo "||  2. [VIETBOT] FULL PREMIUM - V1.2 ||"
-	echo "||  3. [AIBOX++] FULL - V5.1.3       ||"
 	echo "======================================="
 	echo "||          CHỈ CÀI MỖI AI           ||"
-	echo "||  4. [VIETBOT] FREE - V1.2         ||"
-    echo "||  5. [VIETBOT] PREMIUM - V1.2      ||"
-    echo "||  6. [AIBOX++] - V5.1.3            ||"
+	echo "||  3. [VIETBOT] FREE - V1.2         ||"
+    echo "||  4. [VIETBOT] PREMIUM - V1.2      ||"
 	echo "======================================="
 	echo "||        NÂNG CẤP FIRMWARE R1       ||"
-	echo "||  7. Nâng cấp Firmware R1          ||"
-	echo "||  8. Dọn dẹp otaprop & Tắt server  ||"
+	echo "||  5. Nâng cấp Firmware R1          ||"
+	echo "||  6. Dọn dẹp otaprop & Tắt server  ||"
 	echo "======================================="
     echo "||  0. Thoát                         ||"
     echo "======================================="
-    printf "Chọn số theo danh sách (0-8): "
+    printf "Chọn số theo danh sách (0-6): "
 }
 
 main() {
@@ -506,11 +504,10 @@ main() {
         show_menu
         read choice < /dev/tty
         case $choice in
-            1|2|3)
+            1|2)
         case "$choice" in
             1) APK=$FREE_APK ;;
             2) APK=$PREMIUM_APK ;;
-			3) APK=$AIBOXPLUS_APK ;;
         esac
                 echo ""
                 echo "[1/2] Chuẩn bị tải file."
@@ -544,11 +541,10 @@ main() {
                 
                 exit 0
                 ;;	
-            4|5|6)
+            3|4)
         case "$choice" in
-            4) APK=$FREE_APK ;;
-            5) APK=$PREMIUM_APK ;;
-            6) APK=$AIBOXPLUS_APK ;;
+            3) APK=$FREE_APK ;;
+            4) APK=$PREMIUM_APK ;;
         esac
                 echo ""
                 echo "[1/2] Chuẩn bị tải file cập nhật."
@@ -572,10 +568,10 @@ main() {
                 open_browser
                 exit 0
                 ;;
-            7)
+            5)
                 upgrade_firmware_menu
                 ;;
-            8)
+            6)
                 cleanup_upgrade
                 ;;
 			0) exit 0 ;;
