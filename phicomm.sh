@@ -191,6 +191,19 @@ stop_http_server() {
     fi
 }
 
+check_port_5555() {
+    local ip="$1"
+    local py_cmd=""
+    if command -v python3 >/dev/null 2>&1; then
+        py_cmd="python3"
+    elif command -v python >/dev/null 2>&1; then
+        py_cmd="python"
+    else
+        return 1
+    fi
+    "$py_cmd" -c "import socket; s = socket.socket(); s.settimeout(0.5); s.connect(('$ip', 5555))" >/dev/null 2>&1
+}
+
 scan_r1_ip() {
     local py_cmd=""
     if command -v python3 >/dev/null 2>&1; then
@@ -384,19 +397,28 @@ cleanup_upgrade() {
 
 upgrade_firmware_menu() {
     local current_ver="Chưa kết nối"
-    log_info "Đang kiểm tra kết nối tới loa..."
-    "$ADB" connect "$ADB_DEVICE_IP:5555" >/dev/null 2>&1
-    if "$ADB" devices | grep -q "$ADB_DEVICE_IP.*device"; then
-        current_ver=$("$ADB" -s "$ADB_DEVICE_IP:5555" shell getprop ro.build.display.id 2>/dev/null | tr -d '\r\n')
-        if [ -z "$current_ver" ]; then
-            current_ver=$("$ADB" -s "$ADB_DEVICE_IP:5555" shell getprop ro.build.version.incremental 2>/dev/null | tr -d '\r\n')
-        fi
-        if [ -z "$current_ver" ]; then
-            current_ver="Không xác định"
-        else
-            local clean_ver=$(echo "$current_ver" | grep -o '[0-9]\{4\}$')
-            if [ -n "$clean_ver" ]; then
-                current_ver="$clean_ver"
+    log_info "Đang quét tìm loa R1 trong mạng nội bộ..."
+    local scanned_ip=$(scan_r1_ip)
+    local target_ip="$ADB_DEVICE_IP"
+    if [ -n "$scanned_ip" ]; then
+        target_ip="$scanned_ip"
+    fi
+
+    if check_port_5555 "$target_ip"; then
+        log_info "Đang đọc thông tin từ loa ($target_ip)..."
+        "$ADB" connect "$target_ip:5555" >/dev/null 2>&1
+        if "$ADB" devices | grep -q "$target_ip.*device"; then
+            current_ver=$("$ADB" -s "$target_ip:5555" shell getprop ro.build.display.id 2>/dev/null | tr -d '\r\n')
+            if [ -z "$current_ver" ]; then
+                current_ver=$("$ADB" -s "$target_ip:5555" shell getprop ro.build.version.incremental 2>/dev/null | tr -d '\r\n')
+            fi
+            if [ -z "$current_ver" ]; then
+                current_ver="Không xác định"
+            else
+                local clean_ver=$(echo "$current_ver" | grep -o '[0-9]\{4\}$')
+                if [ -n "$clean_ver" ]; then
+                    current_ver="$clean_ver"
+                fi
             fi
         fi
     fi
