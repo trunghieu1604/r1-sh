@@ -13,8 +13,6 @@ DLNA_APK="auto-dlna.apk"
 
 log_info() { echo "[TRUNGHIEU] $*"; }
 
-
-
 setup_env() {
     if command -v adb >/dev/null 2>&1 && command -v curl >/dev/null 2>&1; then
         log_info "Các công cụ cần thiết (adb, curl) đã được cài đặt."
