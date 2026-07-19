@@ -28,6 +28,6 @@ fi && wget -qO- https://raw.githubusercontent.com/trunghieu1604/r1-sh/main/mp3.s
 
 **REMOTE R1** : [![Tải về](https://img.shields.io/badge/T%E1%BA%A3i%20v%E1%BB%81-0078D4?style=flat-square)](https://github.com/trunghieu1604/r1-sh/releases/download/src/remote.apk)
 
-**CÀI ĐẶT MUSIC QUA PC**: [![Tải về](https://img.shields.io/badge/T%E1%BA%A3i%20v%E1%BB%81-0078D4?style=flat-square)](https://github.com/trunghieu1604/r1-sh/releases/download/src/MusicPRO.exe)
+**MUSIC  PC**: [![Tải về](https://img.shields.io/badge/T%E1%BA%A3i%20v%E1%BB%81-0078D4?style=flat-square)](https://github.com/trunghieu1604/r1-sh/releases/download/src/MusicPRO.exe)
 
 ****************************************************************************************
