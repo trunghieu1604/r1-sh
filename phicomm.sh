@@ -504,7 +504,7 @@ config_wifi() {
 	echo "||như chạy script này bằng TERMUX    ||"
     echo "======================================="
     
-    printf "Nhập tên Wi-Fi (SSID): "
+    printf "Nhập Wi-Fi (SSID): "
     read -r ssid
     if [ -z "$ssid" ]; then
         echo "Tên Wi-Fi không được để trống!"
