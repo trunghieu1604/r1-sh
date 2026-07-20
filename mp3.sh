@@ -201,9 +201,12 @@ show_menu() {
 	echo "||       CHỈ CÀI MỖI MUSIC           ||"
 	echo "||  2. [MUSIC]                       ||"
 	echo "======================================="
+	echo "||         CẤU HÌNH WI-FI            ||"
+	echo "||  3. Cấu hình Wi-Fi cho loa R1     ||"
+	echo "======================================="
     echo "||  0. Thoát                         ||"
     echo "======================================="
-    printf "Chọn số theo danh sách (0-2): "
+    printf "Chọn số theo danh sách (0-3): "
 }
 
 main() {
@@ -261,6 +264,9 @@ main() {
                 echo ""
                 config_wifi
                 exit 0
+                ;;
+            3)
+                config_wifi
                 ;;
 			0) exit 0 ;;
             *) echo "Lựa chọn không hợp lệ!"; sleep 2 ;;
