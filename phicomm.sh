@@ -660,16 +660,12 @@ main() {
         esac
                 echo ""
                 echo "[1/2] Chuẩn bị tải file."
-                local app_label="Voicebot"
-                if [ "$choice" -eq 3 ]; then
-                    app_label="Aibox+"
-                fi
-                progress_download "$BASE_URL/$APK" "$HOME/$APK" "$app_label"
+                progress_download "$BASE_URL/$APK" "$HOME/$APK" "Voicebot"
                 progress_download "$BASE_URL/$DLNA_APK" "$HOME/$DLNA_APK" "DLNA"
                 progress_download "$BASE_URL/$UNI_SOUND_APK" "$HOME/$UNI_SOUND_APK" "Unisound"
                 
                 echo ""
-                echo "[2/2] Cài đặt $app_label."
+                echo "[2/2] Cài đặt Voicebot."
                 connect_adb
                 hide_bloatware
                 
@@ -702,14 +698,10 @@ main() {
         esac
                 echo ""
                 echo "[1/2] Chuẩn bị tải file cập nhật."
-                local app_label="Voicebot"
-                if [ "$choice" -eq 6 ]; then
-                    app_label="Aibox+"
-                fi
-                progress_download "$BASE_URL/$APK" "$HOME/$APK" "$app_label"
+                progress_download "$BASE_URL/$APK" "$HOME/$APK" "Voicebot"
                 
                 echo ""
-                echo "[2/2] Cập nhật $app_label."
+                echo "[2/2] Cập nhật Voicebot."
                 connect_adb
                 hide_bloatware
                 
