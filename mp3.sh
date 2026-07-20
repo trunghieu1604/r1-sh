@@ -195,17 +195,60 @@ config_wifi() {
 show_menu() {
     clear
     echo "======================================="
-	echo "||  1. CÀI ĐẶT [MUSIC PRO] + [DLNA}  ||"
-	echo "||  2. CHỈ CÀI [MUSIC PRO]           ||"
-	echo "||  3. CẤU HÌNH WI-FI CHO LOA        ||"
-    echo "||  0. THOÁT                         ||"
+	echo "||          MUSIC - DLNA             ||"
+	echo "||  1. [MUSIC] FULL                  ||"
+	echo "======================================="
+	echo "||       CHỈ CÀI MỖI MUSIC           ||"
+	echo "||  2. [MUSIC]                       ||"
+	echo "======================================="
+	echo "||         CẤU HÌNH WI-FI            ||"
+	echo "||  3. Cấu hình Wi-Fi cho loa R1     ||"
+	echo "======================================="
+    echo "||  0. Thoát                         ||"
     echo "======================================="
     printf "Chọn số theo danh sách (0-3): "
+}
+
+check_password() {
+    local attempts=3
+    local correct_hash="842a3d4b4f09f51f4ce537eb3e5dcdfe"
+    correct_hash=$(printf "%s" "$correct_hash" | tr -d '\r')
+    
+    while [ $attempts -gt 0 ]; do
+        printf "Nhập mật khẩu để sử dụng script: "
+        read -r input_pass
+        input_pass=$(printf "%s" "$input_pass" | tr -d '\r')
+        
+        local input_hash=""
+        if command -v md5sum >/dev/null 2>&1; then
+            input_hash=$(printf "%s" "$input_pass" | md5sum | awk '{print $1}')
+        elif command -v md5 >/dev/null 2>&1; then
+            input_hash=$(printf "%s" "$input_pass" | md5)
+        elif command -v python3 >/dev/null 2>&1; then
+            input_hash=$(python3 -c "import hashlib; print(hashlib.md5(b'''$input_pass''').hexdigest())" 2>/dev/null)
+        elif command -v python >/dev/null 2>&1; then
+            input_hash=$(python -c "import hashlib; print(hashlib.md5(b'''$input_pass''').hexdigest())" 2>/dev/null)
+        fi
+        
+        input_hash=$(printf "%s" "$input_hash" | tr -d '\r' | tr -d ' ' | tr '[:upper:]' '[:lower:]')
+        
+        if [ "$input_hash" = "$correct_hash" ]; then
+            return 0
+        else
+            attempts=$((attempts - 1))
+            if [ $attempts -gt 0 ]; then
+                echo "Sai mật khẩu! Còn lại $attempts lần nhập."
+            fi
+        fi
+    done
+    echo "Sai mật khẩu quá nhiều lần. Script tự động thoát."
+    exit 1
 }
 
 main() {
     exec < /dev/tty
     stty echo 2>/dev/null
+    check_password
     setup_env
     while true; do
         show_menu
