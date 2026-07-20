@@ -195,16 +195,10 @@ config_wifi() {
 show_menu() {
     clear
     echo "======================================="
-	echo "||          MUSIC - DLNA             ||"
-	echo "||  1. [MUSIC] FULL                  ||"
-	echo "======================================="
-	echo "||       CHỈ CÀI MỖI MUSIC           ||"
-	echo "||  2. [MUSIC]                       ||"
-	echo "======================================="
-	echo "||         CẤU HÌNH WI-FI            ||"
-	echo "||  3. Cấu hình Wi-Fi cho loa R1     ||"
-	echo "======================================="
-    echo "||  0. Thoát                         ||"
+	echo "||  1. CÀI ĐẶT [MUSIC PRO] + [DLNA}  ||"
+	echo "||  2. CHỈ CÀI [MUSIC PRO]           ||"
+	echo "||  3. CẤU HÌNH WI-FI CHO LOA        ||"
+    echo "||  0. THOÁT                         ||"
     echo "======================================="
     printf "Chọn số theo danh sách (0-3): "
 }
