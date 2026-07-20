@@ -11,6 +11,7 @@ PACKAGE_NAME="info.dourok.voicebot"
 
 FREE_APK="free.apk"
 PREMIUM_APK="premium.apk"
+AIBOX_APK="aibox+.apk"
 DLNA_APK="auto-dlna.apk"
 UNI_SOUND_APK="uni-sound.apk"
 
@@ -452,7 +453,7 @@ upgrade_firmware() {
 
 cleanup_upgrade() {
     stop_http_server
-    
+    CHOSEN_R1_IP=""
     select_r1_ip
     local r1_ip="$CHOSEN_R1_IP"
 
@@ -541,6 +542,7 @@ config_wifi() {
 }
 
 upgrade_firmware_menu() {
+    CHOSEN_R1_IP=""
     while true; do
         clear
         echo "======================================="
@@ -625,19 +627,21 @@ show_menu() {
 	echo "||   CÀI ĐẶT AI - DLNA - UNISOUND    ||"
 	echo "||  1. [VIETBOT] FULL FREE - V1.2    ||"
     echo "||  2. [VIETBOT] FULL PREMIUM - V1.2 ||"
+    echo "||  3. [AIBOX++] FULL V5.1.3         ||"
 	echo "======================================="
 	echo "||          CHỈ CÀI MỖI AI           ||"
-	echo "||  3. [VIETBOT] FREE - V1.2         ||"
-    echo "||  4. [VIETBOT] PREMIUM - V1.2      ||"
+	echo "||  4. [VIETBOT] FREE - V1.2         ||"
+    echo "||  5. [VIETBOT] PREMIUM - V1.2      ||"
+    echo "||  6. [AIBOX++] v5.1.3              ||"
 	echo "======================================="
 	echo "||        CẤU HÌNH & NÂNG CẤP LOA    ||"
-	echo "||  5. Cấu hình Wi-Fi cho loa R1     ||"
-	echo "||  6. Nâng cấp Firmware R1          ||"
-	echo "||  7. Xoá Cấu hình cũ & Tắt Server  ||"
+	echo "||  7. Cấu hình Wi-Fi cho loa R1     ||"
+	echo "||  8. Nâng cấp Firmware R1          ||"
+	echo "||  9. Xoá Cấu hình cũ & Tắt Server  ||"
 	echo "======================================="
     echo "||  0. Thoát                         ||"
     echo "======================================="
-    printf "Chọn số theo danh sách (0-7): "
+    printf "Chọn số theo danh sách (0-9): "
 }
 
 main() {
@@ -648,19 +652,24 @@ main() {
         show_menu
         read -r choice
         case $choice in
-            1|2)
+            1|2|3)
         case "$choice" in
             1) APK=$FREE_APK ;;
             2) APK=$PREMIUM_APK ;;
+            3) APK=$AIBOX_APK ;;
         esac
                 echo ""
                 echo "[1/2] Chuẩn bị tải file."
-                progress_download "$BASE_URL/$APK" "$HOME/$APK" "Voicebot"
+                local app_label="Voicebot"
+                if [ "$choice" -eq 3 ]; then
+                    app_label="Aibox+"
+                fi
+                progress_download "$BASE_URL/$APK" "$HOME/$APK" "$app_label"
                 progress_download "$BASE_URL/$DLNA_APK" "$HOME/$DLNA_APK" "DLNA"
                 progress_download "$BASE_URL/$UNI_SOUND_APK" "$HOME/$UNI_SOUND_APK" "Unisound"
                 
                 echo ""
-                echo "[2/2] Cài đặt Voicebot."
+                echo "[2/2] Cài đặt $app_label."
                 connect_adb
                 hide_bloatware
                 
@@ -685,17 +694,22 @@ main() {
                 
                 exit 0
                 ;;	
-            3|4)
+            4|5|6)
         case "$choice" in
-            3) APK=$FREE_APK ;;
-            4) APK=$PREMIUM_APK ;;
+            4) APK=$FREE_APK ;;
+            5) APK=$PREMIUM_APK ;;
+            6) APK=$AIBOX_APK ;;
         esac
                 echo ""
                 echo "[1/2] Chuẩn bị tải file cập nhật."
-                progress_download "$BASE_URL/$APK" "$HOME/$APK" "Voicebot"
+                local app_label="Voicebot"
+                if [ "$choice" -eq 6 ]; then
+                    app_label="Aibox+"
+                fi
+                progress_download "$BASE_URL/$APK" "$HOME/$APK" "$app_label"
                 
                 echo ""
-                echo "[2/2] Cập nhật Voicebot."
+                echo "[2/2] Cập nhật $app_label."
                 connect_adb
                 hide_bloatware
                 
@@ -712,13 +726,13 @@ main() {
                 open_browser
                 exit 0
                 ;;
-            5)
+            7)
                 config_wifi
                 ;;
-            6)
+            8)
                 upgrade_firmware_menu
                 ;;
-            7)
+            9)
                 cleanup_upgrade
                 ;;
 			0) exit 0 ;;
