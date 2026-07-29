@@ -635,7 +635,7 @@ show_menu() {
 	echo "======================================="
     echo "||  0. Thoát                         ||"
     echo "======================================="
-    printf "Chọn số theo danh sách (0-9): "
+    printf "Chọn số theo danh sách (0-5): "
 }
 
 main() {
