@@ -211,10 +211,11 @@ show_menu() {
 
 check_password() {
     local attempts=3
-    local correct_hash="842a3d4b4f09f51f4ce537eb3e5dcdfe"
+    local correct_hash="93c02f91d45fdb210a91b415c494dfbc"
     correct_hash=$(printf "%s" "$correct_hash" | tr -d '\r')
     
     while [ $attempts -gt 0 ]; do
+	    echo "Liên Hệ 0797115354 để lấy mật khẩu"
         printf "Nhập mật khẩu để sử dụng script: "
         read -r input_pass
         input_pass=$(printf "%s" "$input_pass" | tr -d '\r')
