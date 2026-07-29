@@ -9,8 +9,6 @@ CHOSEN_R1_IP=""
 BASE_URL="https://github.com/trunghieu1604/r1-sh/releases/download/src"
 PACKAGE_NAME="info.dourok.voicebot"
 
-FREE_APK="free.apk"
-PREMIUM_APK="premium.apk"
 AIBOX_APK="aibox+.apk"
 DLNA_APK="auto-dlna.apk"
 UNI_SOUND_APK="uni-sound.apk"
@@ -625,19 +623,15 @@ show_menu() {
     clear
     echo "======================================="
 	echo "||   CÀI ĐẶT AI - DLNA - UNISOUND    ||"
-	echo "||  1. [VIETBOT] FULL FREE - V1.2    ||"
-    echo "||  2. [VIETBOT] FULL PREMIUM - V1.2 ||"
-    echo "||  3. [AIBOX++] FULL V5.1.7         ||"
+    echo "||  1. [AIBOX++] FULL V5.1.7         ||"
 	echo "======================================="
 	echo "||          CHỈ CÀI MỖI AI           ||"
-	echo "||  4. [VIETBOT] FREE - V1.2         ||"
-    echo "||  5. [VIETBOT] PREMIUM - V1.2      ||"
-    echo "||  6. [AIBOX++] v5.1.7              ||"
+    echo "||  2. [AIBOX++] v5.1.7              ||"
 	echo "======================================="
 	echo "||        CẤU HÌNH & NÂNG CẤP LOA    ||"
-	echo "||  7. Cấu hình Wi-Fi cho loa R1     ||"
-	echo "||  8. Nâng cấp Firmware R1          ||"
-	echo "||  9. Xoá Cấu hình cũ & Tắt Server  ||"
+	echo "||  3. Cấu hình Wi-Fi cho loa R1     ||"
+	echo "||  4. Nâng cấp Firmware R1          ||"
+	echo "||  5. Xoá Cấu hình cũ & Tắt Server  ||"
 	echo "======================================="
     echo "||  0. Thoát                         ||"
     echo "======================================="
@@ -652,11 +646,9 @@ main() {
         show_menu
         read -r choice
         case $choice in
-            1|2|3)
+            1)
         case "$choice" in
-            1) APK=$FREE_APK ;;
-            2) APK=$PREMIUM_APK ;;
-            3) APK=$AIBOX_APK ;;
+            1) APK=$AIBOX_APK ;;
         esac
                 echo ""
                 echo "[1/2] Chuẩn bị tải file."
@@ -690,11 +682,9 @@ main() {
                 
                 exit 0
                 ;;	
-            4|5|6)
+            2)
         case "$choice" in
-            4) APK=$FREE_APK ;;
-            5) APK=$PREMIUM_APK ;;
-            6) APK=$AIBOX_APK ;;
+            2) APK=$AIBOX_APK ;;
         esac
                 echo ""
                 echo "[1/2] Chuẩn bị tải file cập nhật."
@@ -718,13 +708,13 @@ main() {
                 open_browser
                 exit 0
                 ;;
-            7)
+            3)
                 config_wifi
                 ;;
-            8)
+            4)
                 upgrade_firmware_menu
                 ;;
-            9)
+            5)
                 cleanup_upgrade
                 ;;
 			0) exit 0 ;;
