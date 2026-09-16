@@ -623,10 +623,10 @@ show_menu() {
     clear
     echo "======================================="
 	echo "||   CÀI ĐẶT AI - DLNA - UNISOUND    ||"
-    echo "||  1. [AIBOX++] FULL V5.1.8         ||"
+    echo "||  1. [AIBOX++] FULL V5.1.9         ||"
 	echo "======================================="
 	echo "||          CHỈ CÀI MỖI AI           ||"
-    echo "||  2. [AIBOX++] v5.1.8              ||"
+    echo "||  2. [AIBOX++] v5.1.9              ||"
 	echo "======================================="
 	echo "||        CẤU HÌNH & NÂNG CẤP LOA    ||"
 	echo "||  3. Cấu hình Wi-Fi cho loa R1     ||"
