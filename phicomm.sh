@@ -185,13 +185,91 @@ launch() {
     "$ADB" -s "$ADB_DEVICE" shell am start -n "$PACKAGE_NAME/.java.activities.MainActivity"
 }
 
+invoke_on_speaker() {
+    local cmd="$1"
+    local limit_sec="${2:-300}"
+    local dev_log="/data/local/tmp/install-cmd.log"
+    local token="t$(date +%s 2>/dev/null || echo 0)$$"
+    
+    local launch="trap '' HUP; ( echo begin $token; $cmd; echo exit=\$? end $token ) > $dev_log 2>&1 &"
+    local read_cmd="cat $dev_log 2>/dev/null || echo NOLOG"
+    
+    local waited=0
+    local launched=0
+    local relaunch=1
+    local out=""
+
+    while [ "$waited" -lt "$limit_sec" ]; do
+        if [ "$relaunch" -eq 1 ] && [ "$launched" -lt 3 ]; then
+            if ! is_device_connected; then
+                "$ADB" connect "$ADB_DEVICE" >/dev/null 2>&1
+            fi
+            "$ADB" -s "$ADB_DEVICE" shell "$launch" >/dev/null 2>&1
+            launched=$((launched + 1))
+            relaunch=0
+        fi
+
+        sleep 3
+        waited=$((waited + 3))
+
+        if ! is_device_connected; then
+            "$ADB" connect "$ADB_DEVICE" >/dev/null 2>&1
+        fi
+
+        out=$("$ADB" -s "$ADB_DEVICE" shell "$read_cmd" 2>/dev/null)
+        if echo "$out" | grep -q "end $token"; then
+            echo ""
+            return 0
+        elif echo "$out" | grep -q "begin $token"; then
+            : 
+        elif echo "$out" | grep -q "^NOLOG" || echo "$out" | grep -q "begin t"; then
+            relaunch=1 
+        else
+            "$ADB" connect "$ADB_DEVICE" >/dev/null 2>&1
+        fi
+        printf "."
+    done
+
+    echo ""
+    return 1
+}
+
 install_apk() {
     local local_path="$1"
     local apk_file=$(basename "$local_path")
-    log_info "Đẩy $apk_file lên thiết bị..."
-    "$ADB" -s "$ADB_DEVICE" push "$local_path" "/data/local/tmp/$apk_file"
-    log_info "Cài đặt $apk_file..."
-    "$ADB" -s "$ADB_DEVICE" shell /system/bin/pm install -r "/data/local/tmp/$apk_file"
+    local dev_apk="/data/local/tmp/$apk_file"
+    
+    local pushed=0
+    local try=1
+    while [ "$try" -le 3 ]; do
+        log_info "Đẩy $apk_file lên thiết bị (lần $try/3)..."
+        if ! is_device_connected; then
+            "$ADB" connect "$ADB_DEVICE" >/dev/null 2>&1
+        fi
+        if "$ADB" -s "$ADB_DEVICE" push "$local_path" "$dev_apk" >/dev/null 2>&1; then
+            pushed=1
+            log_info "Đã đẩy $apk_file thành công."
+            break
+        fi
+        log_info "Chép $apk_file bị gián đoạn, đang thử lại..."
+        sleep 2
+        try=$((try + 1))
+    done
+
+    if [ "$pushed" -ne 1 ]; then
+        log_info "Lỗi: Không thể đẩy $apk_file sang loa."
+        return 1
+    fi
+
+    log_info "Đang cài đặt $apk_file (chạy ngầm trên loa, vui lòng chờ)..."
+    printf "[TRUNGHIEU] Tiến trình: "
+    if invoke_on_speaker "/system/bin/pm install -r $dev_apk" 300; then
+        log_info "Cài đặt $apk_file hoàn tất."
+    else
+        log_info "Thời gian chờ cài đặt $apk_file quá lâu hoặc kết nối bị gián đoạn."
+    fi
+
+    "$ADB" -s "$ADB_DEVICE" shell rm -f "$dev_apk" >/dev/null 2>&1
 }
 
 detect_local_ip() {
