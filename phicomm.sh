@@ -312,19 +312,20 @@ start_http_server() {
         "$py_cmd" -m SimpleHTTPServer "$port" >/dev/null 2>&1 &
     fi
     local pid=$!
-    echo $pid > /tmp/r1_http.pid
+    echo $pid > "${TMPDIR:-$HOME}/r1_http.pid"
     log_info "HTTP Server đang chạy ngầm với PID $pid."
 }
 
 stop_http_server() {
-    if [ -f "/tmp/r1_http.pid" ]; then
-        local pid=$(cat /tmp/r1_http.pid)
+    local pid_file="${TMPDIR:-$HOME}/r1_http.pid"
+    if [ -f "$pid_file" ]; then
+        local pid=$(cat "$pid_file")
         if kill -0 "$pid" 2>/dev/null; then
             log_info "Đang tắt HTTP Server cũ (PID $pid)..."
             kill "$pid" 2>/dev/null
             sleep 1
         fi
-        rm -f /tmp/r1_http.pid
+        rm -f "$pid_file"
     fi
 }
 
