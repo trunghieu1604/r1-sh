@@ -9,7 +9,6 @@ BASE_URL="https://github.com/trunghieu1604/r1-sh/releases/download/src"
 PACKAGE_NAME="com.wifi.transfer.pro"
 
 MUSIC_APK="music.apk"
-M_DNS_APK="music-mdns.apk"
 DLNA_APK="auto-dlna.apk"
 
 log_info() { echo "[TRUNGHIEU] $*"; }
@@ -199,16 +198,10 @@ show_menu() {
 	echo "||      CÀI MỚI THÌ CHỌN OPTION 1/2   ||"
 	echo "||  1. MUSIC + ĐIỀU KHIỂN LOA.        ||"
 	echo "||  2. UPDATE MUSIC.                  ||"
-	echo "||  3. MUSIC MDNS + ĐIỀU KHIỂN LOA.   ||"
-	echo "||  4. UPDATE MUSIC MDNS.             ||"
-	echo "||  5. CẤU HÌNH WI-FI.                ||"
+	echo "||  3. CẤU HÌNH WI-FI.                ||"
     echo "||  0. THOÁT.                         ||"
     echo "========================================"
-	echo "||       *** HƯỚNG DẪN CÀI ***        ||"
-	echo "|| OPTION 1 VÀ 2 NẾU CÀI CHUNG VỚI AI ||"
-	echo "|| OPTION 3 VÀ 4 NẾU CHỈ CÀI MỖI NHẠC ||"
-	echo "========================================"
-    printf "Chọn số theo danh sách (0-5): "
+    printf "Chọn số theo danh sách (0-3): "
 }
 
 check_password() {
@@ -305,55 +298,7 @@ main() {
                 config_wifi
                 exit 0
                 ;;
-			3)
-                APK=$M_DNS_APK
-                echo ""
-                echo "[1/2] Chuẩn bị tải file."
-                progress_download "$BASE_URL/$APK" "$HOME/$APK" "MUSIC-MDNS"
-                progress_download "$BASE_URL/$DLNA_APK" "$HOME/$DLNA_APK" "DLNA"
-                
-                echo ""
-                echo "[2/2] Cài đặt MUSIC."
-                connect_adb
-                hide_bloatware
-                
-                log_info "Kiểm tra làm sạch thiết bị..."
-                "$ADB" -s "$ADB_DEVICE" shell /system/bin/pm uninstall "$PACKAGE_NAME"
-                
-                install_apk "$HOME/$APK"
-                launch
-                
-                install_apk "$HOME/$DLNA_APK"
-				launch1
-				
-                "$ADB" -s "$ADB_DEVICE" shell settings put secure install_non_market_apps 1
-                
-                echo ""
-                config_wifi
-                exit 0
-                ;;	
-            4)
-                APK=$M_DNS_APK
-                echo ""
-                echo "[1/2] Chuẩn bị tải file cập nhật."
-                progress_download "$BASE_URL/$APK" "$HOME/$APK" "MUSIC"
-                
-                echo ""
-                echo "[2/2] Cập nhật MUSIC."
-                connect_adb
-                hide_bloatware
-                
-                log_info "Kiểm tra làm sạch thiết bị..."
-                "$ADB" -s "$ADB_DEVICE" shell /system/bin/pm uninstall "$PACKAGE_NAME"
-                
-                install_apk "$HOME/$APK"
-                launch
-                
-                echo ""
-                config_wifi
-                exit 0
-                ;;
-            5)
+            3)
                 config_wifi
                 ;;
 			0) exit 0 ;;
